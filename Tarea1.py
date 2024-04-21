@@ -21,3 +21,4 @@ sillasE,barberos,sillasB,clientes = leerArchivo()
 
 print(sillasE, "",barberos,"",sillasB)
 print(clientes)
+print("La melodia con la calle tony dise(prueba de commit)")
