@@ -2,6 +2,7 @@ import threading as th
 import time as t 
 import random as r
 
+
 def leerArchivo():
     with open("file10.data",'r') as archivo: #Para que funcione, el archivo debe estar en el mismo directorio en donde se esta ejecutando 
         read = archivo.readlines()
@@ -13,10 +14,9 @@ def leerArchivo():
 
 
 sillasE,barberos,sillasB,clientes = leerArchivo()
-#num_clientes =  len(clientes)
-
 print(sillasE, "",barberos,"",sillasB)
 print(clientes)
+
 
 #sem_entra_cliente = th.Semaphore(num_clientes)
 sem_sillasE = th.Semaphore(sillasE)
@@ -123,6 +123,7 @@ for j in range(num_clientes):
     th_clientes.append(th_cliente)
     th_cliente.start()
     t.sleep(r.randrange(2))
+
 
 for k in th_clientes:
     th_cliente.join()
