@@ -38,12 +38,19 @@ def Cortarpelo(num_cliente):
     global g_sillasB
     global g_barberos
 
+
+    tiempo_entrada, tiempo_espera, tiempo_corte = clientes[num_cliente]
+
+    #sem_clienteEspera = th.Semaphore(tiempo_espera)
+    
+
     #Entra un cliente
+    
     sem_mostrar.acquire()
     print(f"entra cliente {num_cliente} a barberia\n")
     sem_mostrar.release()
 
-    t.sleep(r.randrange(3))
+    t.sleep(1)
     
     #Se sienta un cliente
     sem_sillasE.acquire()
@@ -54,6 +61,7 @@ def Cortarpelo(num_cliente):
     sem_mostrar.release()
     
     #Se sienta un cliente en una silla de barbero
+    
     sem_sillasB.acquire()
     g_sillasB = g_sillasB - 1
     g_sillasE = g_sillasE + 1 #Aumenta el numero de sillas de espera
@@ -62,15 +70,16 @@ def Cortarpelo(num_cliente):
     print(f"cliente {num_cliente} usa silla de barbero {numSilla_barbero}\n")
     sem_mostrar.release()
     sem_sillasB.release()
-    #t.sleep(r.randrange(timepoCorteCliente))
+    t.sleep(tiempo_corte)
 
     #Barbero corta el pelo 
     sem_listoParaCorte.release()
-    t.sleep(r.randrange(3))
+    
 
     sem_Barberos.acquire()
     g_barberos= g_barberos- 1
     num_barbero = barberos-g_barberos
+    t.sleep(tiempo_corte)
     sem_mostrar.acquire()
     print(f"barbero {num_barbero} atiende a cliente {num_cliente}\n")
     sem_mostrar.release()
@@ -83,7 +92,7 @@ def Cortarpelo(num_cliente):
     sem_mostrar.acquire()
     print(f"sale cliente {num_cliente} (atendido por completo)\n")
     sem_mostrar.release()
-    t.sleep(r.randrange(3))
+    t.sleep(1)
 
 
     #t.sleep(r.randrange(3))
@@ -91,9 +100,11 @@ def Cortarpelo(num_cliente):
 
 def Barbero():
     global g_sillasB
+    global tiempoCorte
 
     while(True): #Entrada de clientes
         sem_listoParaCorte.acquire()
+        #sem_clienteEsperaCorte
 
         sem_Barberos.acquire()
         sem_Barberos.release()
@@ -108,21 +119,27 @@ def Barbero():
 th_barberos = []
 
 for i in range(barberos):
-    th_barb = th.Thread(target=Barbero)
-    th_barb.setDaemon(True)
+    th_barb = th.Thread(target=Barbero, daemon = True)
+    #th_barb.setDaemon(True)
     th_barberos.append(th_barb)
     th_barb.start()
+
+
+
+
 
 
 th_clientes = []
 num_clientes =  len(clientes)
 
 for j in range(num_clientes):
-    th_cliente = th.Thread(target = Cortarpelo, args = [j])
-    th_cliente.setDaemon(True)
+    tiempo_entrada, tiempo_espera, tiempo_corte = clientes[j]
+    t.sleep(tiempo_entrada)
+    th_cliente = th.Thread(target = Cortarpelo, daemon = True, args = [j])
+    #th_cliente.setDaemon(True)
     th_clientes.append(th_cliente)
     th_cliente.start()
-    t.sleep(r.randrange(2))
+
 
 
 for k in th_clientes:
